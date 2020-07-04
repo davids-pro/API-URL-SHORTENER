@@ -1,0 +1,51 @@
+const mongoose = require('mongoose');
+
+const Document = mongoose.Schema({
+  shortId: { type: String },
+  url: { type: String },
+  created: { type: Date, default: Date.now },
+  clickCount: { type: Number, default: 0 },
+  metadata: {
+    url: { type: String, default: '' },
+    canonical: { type: String, default: '' },
+    title: { type: String, default: '' },
+    image: { type: String, default: '' },
+    author: { type: String, default: '' },
+    description: { type: String, default: '' },
+    keywords: { type: String, default: '' },
+    source: { type: String, default: '' },
+    'og:url': { type: String, default: '' },
+    'og:locale': { type: String, default: '' },
+    'og:locale:alternate': { type: String, default: '' },
+    'og:title': { type: String, default: '' },
+    'og:type': { type: String, default: '' },
+    'og:description': { type: String, default: '' },
+    'og:determiner': { type: String, default: '' },
+    'og:site_name': { type: String, default: '' },
+    'og:image': { type: String, default: '' },
+    'og:image:secure_url': { type: String, default: '' },
+    'og:image:type': { type: String, default: '' },
+    'og:image:width': { type: String, default: '' },
+    'og:image:height': { type: String, default: '' },
+    price: { type: String, default: '' },
+    priceCurrency: { type: String, default: '' },
+    availability: { type: String, default: '' },
+    'article:published_time': { type: String, default: '' },
+    'article:modified_time': { type: String, default: '' },
+    'article:expiration_time': { type: String, default: '' },
+    'article:author': { type: String, default: '' },
+    'article:section': { type: String, default: '' },
+    'article:tag': { type: String, default: '' },
+    'og:article:published_time': { type: String, default: '' },
+    'og:article:modified_time': { type: String, default: '' },
+    'og:article:expiration_time': { type: String, default: '' },
+    'og:article:author': { type: String, default: '' },
+    'og:article:section': { type: String, default: '' },
+    'og:article:tag': { type: String, default: '' }
+  },
+  qrCode: { type: String, default: '' },
+  userId: { type: String, default: '' },
+  customized: { type: Boolean, default: false }
+});
+
+module.exports = mongoose.model('Document', Document);
