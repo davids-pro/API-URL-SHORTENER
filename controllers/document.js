@@ -88,6 +88,16 @@ const getDocumentByShortId = (req, res) => {
     });
 };
 
+const getDocumentsByUserId = (req, res) => {
+  Document.find({ userId: req.params.userId })
+    .then((mongoDocumentArray) => {
+      res.status(200).json(mongoDocumentArray);
+    })
+    .catch((err) => {
+      res.status(400).json(err);
+    });
+};
+
 const updateDocumentById = (req, res) => {
   Document.findByIdAndUpdate(req.params.id, { ...req.body }, { new: true })
     .then((mongoDocument) => {
@@ -125,6 +135,7 @@ const verifyIfIdIsAvailable = (req, res) => {
 exports.createGenericDocument = createGenericDocument;
 exports.createCustomDocument = createCustomDocument;
 exports.getDocumentByShortId = getDocumentByShortId;
+exports.getDocumentsByUserId = getDocumentsByUserId;
 exports.updateDocumentById = updateDocumentById;
 exports.deleteDocumentById = deleteDocumentById;
 exports.verifyIfIdIsAvailable = verifyIfIdIsAvailable;
