@@ -111,7 +111,7 @@ const updateDocumentById = (req, res) => {
 const deleteDocumentById = (req, res) => {
   Document.findByIdAndDelete(req.params.id)
     .then(() => {
-      res.status(200).send('Document deleted');
+      res.status(200).json();
     })
     .catch((err) => {
       res.status(400).json(err);

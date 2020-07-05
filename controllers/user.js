@@ -37,12 +37,12 @@ const getUserByUsername = (req, res) => {
         if (result) {
           res.status(200).json(mongoUser);
         } else {
-          res.status(401).send('Authentification failed');
+          res.status(401).json();
         }
       });
     })
     .catch((err) => {
-      res.status(401).send('Authentification failed');
+      res.status(401).json();
     });
 };
 
@@ -59,7 +59,7 @@ const updateUserById = (req, res) => {
 const deleteUserById = (req, res) => {
   User.findByIdAndDelete(req.params.id)
     .then(() => {
-      res.status(200).send('User deleted');
+      res.status(200).json();
     })
     .catch((err) => {
       res.status(400).json(err);
