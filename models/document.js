@@ -3,10 +3,8 @@ const mongoose = require('mongoose');
 const Document = mongoose.Schema({
   shortId: { type: String },
   url: { type: String },
-  isImage: { type: Boolean, default: false },
   created: { type: Date, default: Date.now },
   clickCount: { type: Number, default: 0 },
-  metadata: { type: Object },
   qrCode: { type: String, default: '' },
   userId: { type: String, default: '' },
   customized: { type: Boolean, default: false }
