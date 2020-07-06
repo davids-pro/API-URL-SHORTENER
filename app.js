@@ -1,8 +1,9 @@
 /**
  * pensez à renseigner le fichier .env
- * DB_HOST = adresse de la bdd Mongo
- * DB_USER = nom d'utilisateur de la bdd
- * BD_PASS = mot de passe de la bdd
+ * DB_HOST = adresse de la MongoDB
+ * DB_AUTH = nom de la collection MongoDB contenant les users de la DB
+ * DB_USER = nom d'utilisateur de la DB
+ * BD_PASS = mot de passe de la DB
  */
 require('custom-env').env('prod');
 
@@ -21,7 +22,7 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
-    auth: { authSource: 'admin' },
+    auth: { authSource: process.env.DB_AUTH },
     user: process.env.DB_USER,
     pass: process.env.DB_PASS
   })
