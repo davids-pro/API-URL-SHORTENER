@@ -1,4 +1,5 @@
 const Document = require('../models/document');
+const urlMetadata = require('url-metadata');
 
 const qrCode = require('qrcode');
 const qrCodeOptions = {
@@ -29,44 +30,62 @@ const checkId = (id) => {
 };
 
 const addHttpProtocol = (url) => {
-  const protocols = /^(http:\/\/|https:\/\/|ftp:\/\/|sftp:\/\/|ssh:\/\/)/;
-  if (protocols.test(url)) {
+  const protocols = /^(http:\/\/|https:\/\/|ftp:\/\/|sftp:\/\/|ssh:\/\/|data:image)/;
+  return protocols.test(url) ? url : 'http://' + url;
+};
+
+const addPreviewImage = async (url) => {
+  if (url.match(/\.(jpeg|jpg|gif|png|webp)$/) !== null || url.match(/^data:image/) !== null) {
     return url;
   } else {
-    return 'http://' + url;
+    const image = await new Promise((resolve, reject) => {
+      urlMetadata(url)
+        .then((metadata) => {
+          resolve(metadata.image);
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    });
+    return image;
   }
 };
 
-const generateQrCodeAndSaveDocument = (req, res, shortId) => {
+const generateAndSaveDocument = (req, res, shortId) => {
   req.body.url = addHttpProtocol(req.body.url);
   const newDocument = new Document({ ...req.body });
   newDocument.shortId = shortId;
-  qrCode.toDataURL(uri + newDocument.shortId, qrCodeOptions, (err, qrCode) => {
-    newDocument.qrCode = qrCode;
-    newDocument
-      .save()
-      .then((mongoDocument) => {
-        res.status(201).json(mongoDocument);
-      })
-      .catch((err) => {
-        res.status(400).json(err);
+  addPreviewImage(newDocument.url)
+    .then((url) => {
+      newDocument.image = url;
+    })
+    .catch((err) => {
+      console.log(err);
+    })
+    .finally(() => {
+      qrCode.toDataURL(uri + newDocument.shortId, qrCodeOptions, (err, qrCode) => {
+        newDocument.qrCode = qrCode;
+        newDocument
+          .save()
+          .then((mongoDocument) => {
+            res.status(201).json(mongoDocument);
+          })
+          .catch((err) => {
+            res.status(400).json(err);
+          });
       });
-  });
+    });
 };
 
 const createGenericDocument = (req, res) => {
   const shortId = idGenerator();
   checkId(shortId).then((document) => {
-    if (document) {
-      createGenericDocument(req, res);
-    } else {
-      generateQrCodeAndSaveDocument(req, res, shortId);
-    }
+    document ? createGenericDocument(req, res) : generateAndSaveDocument(req, res, shortId);
   });
 };
 
 const createCustomDocument = (req, res) => {
-  generateQrCodeAndSaveDocument(req, res, req.params.shortId);
+  generateAndSaveDocument(req, res, req.params.shortId);
 };
 
 const getDocumentByShortId = (req, res) => {
@@ -112,11 +131,7 @@ const deleteDocumentById = (req, res) => {
 const verifyIfIdIsAvailable = (req, res) => {
   checkId(req.params.shortId)
     .then((mongoDocument) => {
-      if (mongoDocument) {
-        res.status(200).json(false);
-      } else {
-        res.status(200).json(true);
-      }
+      mongoDocument ? res.status(200).json(false) : res.status(200).json(true);
     })
     .catch((err) => {
       res.status(400).json(err);

@@ -36,7 +36,6 @@ app.use(cors());
 
 app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 app.use(bodyParser.json({ limit: '50mb' }));
-app.use(express.static(__dirname + '/assets'));
 
 const documentRoutes = require('./routes/document');
 const userRoutes = require('./routes/user');

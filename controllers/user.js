@@ -34,11 +34,7 @@ const getUserByUsername = (req, res) => {
   User.findOne({ username: req.body.username })
     .then((mongoUser) => {
       bcrypt.compare(req.body.password, mongoUser.password, (err, result) => {
-        if (result) {
-          res.status(200).json(mongoUser);
-        } else {
-          res.status(401).json();
-        }
+        result ? res.status(200).json(mongoUser) : res.status(401).json();
       });
     })
     .catch((err) => {
@@ -69,11 +65,7 @@ const deleteUserById = (req, res) => {
 const verifyIfUsernameIsAvailable = (req, res) => {
   User.findOne({ username: req.body.username })
     .then((mongoUser) => {
-      if (mongoUser) {
-        res.status(200).json(false);
-      } else {
-        res.status(200).json(true);
-      }
+      mongoUser ? res.status(200).json(false) : res.status(200).json(true);
     })
     .catch((err) => {
       res.status(400).json(err);
