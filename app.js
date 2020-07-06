@@ -46,7 +46,4 @@ app.use('/documents/', documentRoutes);
 app.use('/users/', userRoutes);
 app.use('/', globalRoutes);
 
-app.set('view engine', 'pug');
-app.set('views', 'views');
-
 module.exports = app;

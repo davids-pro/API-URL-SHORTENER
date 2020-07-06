@@ -10,14 +10,7 @@ const redirectToOriginalUrl = (req, res) => {
     .then((mongoDocument) => {
       document = mongoDocument;
       if (mongoDocument) {
-        // if (mongoDocument.isImage) {
-          res.redirect(mongoDocument.url)
-        // } else {
-        //   res.render('fake-page', {
-        //     mongoDocument: mongoDocument,
-        //     pugObject: JSON.stringify(mongoDocument)
-        //   });
-        // }
+        res.redirect(mongoDocument.url);
       } else {
         redirectToFront(req, res);
       }
