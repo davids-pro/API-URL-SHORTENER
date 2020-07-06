@@ -98,7 +98,6 @@ const createCustomDocument = (req, res) => {
     } else {
       urlMetadata(newDocument.url)
         .then((metadata) => {
-          console.log(metadata);
           newDocument.metadata = metadata;
         })
         .catch((err) => {
