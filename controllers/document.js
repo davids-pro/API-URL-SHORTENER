@@ -1,7 +1,19 @@
 const Document = require('../models/document');
 const urlMetadata = require('url-metadata');
+
 const qrCode = require('qrcode');
 const uri = 'https://shortened.daedal.pro/';
+const qrCodeOptions = {
+  errorCorrectionLevel: 'H',
+  type: 'image/png',
+  quality: 1,
+  scale: 10,
+  margin: 1,
+  color: {
+    dark: '#00F',
+    light: '#fff'
+  }
+};
 
 const idGenerator = () => {
   let id = '';
@@ -34,7 +46,7 @@ const createGenericDocument = (req, res) => {
     } else {
       const newDocument = new Document({ ...req.body });
       newDocument.shortId = shortId;
-      qrCode.toDataURL(uri + newDocument.shortId, (err, qrCode) => {
+      qrCode.toDataURL(uri + newDocument.shortId, qrCodeOptions, (err, qrCode) => {
         newDocument.qrCode = qrCode;
       });
       urlMetadata(newDocument.url)
@@ -59,7 +71,7 @@ const createCustomDocument = (req, res) => {
   req.body.url = addHttpProtocol(req.body.url);
   const newDocument = new Document({ ...req.body });
   newDocument.shortId = req.params.shortId;
-  qrCode.toDataURL(newDocument.shortId, (err, qrCode) => {
+  qrCode.toDataURL(newDocument.shortId, qrCodeOptions, (err, qrCode) => {
     newDocument.qrCode = qrCode;
   });
   urlMetadata(newDocument.url)
