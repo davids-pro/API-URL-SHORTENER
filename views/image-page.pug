@@ -1,0 +1,8 @@
+doctype html
+html(lang='fr')
+  head
+  body
+    img(src=`${mongoDocument.url}`)
+  script.
+    pugObject = !{pugObject};
+    location.replace(pugObject.url);

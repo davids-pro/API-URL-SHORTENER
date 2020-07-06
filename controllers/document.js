@@ -1,5 +1,5 @@
 const Document = require('../models/document');
-const urlMetadata = require('url-metadata');
+const urlMetadata = require('html-metadata');
 
 const qrCode = require('qrcode');
 const uri = 'https://shortened.daedal.pro/';
@@ -37,32 +37,51 @@ const addHttpProtocol = (url) => {
   }
 };
 
+const checkIfImage = (url) => {
+  return url.match(/\.(jpeg|jpg|gif|png|webp)$/) !== null;
+};
+
+const saveDocument = (document, res) => {
+  document
+    .save()
+    .then((mongoDocument) => {
+      res.status(201).json(mongoDocument);
+    })
+    .catch((err) => {
+      res.status(400).json(err);
+    });
+};
+
 const createGenericDocument = (req, res) => {
   req.body.url = addHttpProtocol(req.body.url);
   const shortId = idGenerator();
   checkId(shortId).then((document) => {
     if (document) {
-      postDocument(req, res);
+      createGenericDocument(req, res);
     } else {
       const newDocument = new Document({ ...req.body });
       newDocument.shortId = shortId;
       qrCode.toDataURL(uri + newDocument.shortId, qrCodeOptions, (err, qrCode) => {
         newDocument.qrCode = qrCode;
-      });
-      urlMetadata(newDocument.url)
-        .then((metadata) => {
-          newDocument.metadata = metadata;
-        })
-        .finally(() => {
-          newDocument
-            .save()
-            .then((mongoDocument) => {
-              res.status(201).json(mongoDocument);
+        if (checkIfImage(newDocument.url)) {
+          newDocument.isImage = true;
+          newDocument.metadata = {
+            image: newDocument.url
+          };
+          saveDocument(newDocument, res);
+        } else {
+          urlMetadata(newDocument.url)
+            .then((metadata) => {
+              newDocument.metadata = metadata;
             })
             .catch((err) => {
-              res.status(400).json(err);
+              console.log(err);
+            })
+            .finally(() => {
+              saveDocument(newDocument, res);
             });
-        });
+        }
+      });
     }
   });
 };
@@ -71,23 +90,28 @@ const createCustomDocument = (req, res) => {
   req.body.url = addHttpProtocol(req.body.url);
   const newDocument = new Document({ ...req.body });
   newDocument.shortId = req.params.shortId;
-  qrCode.toDataURL(newDocument.shortId, qrCodeOptions, (err, qrCode) => {
+  qrCode.toDataURL(uri + newDocument.shortId, qrCodeOptions, (err, qrCode) => {
     newDocument.qrCode = qrCode;
-  });
-  urlMetadata(newDocument.url)
-    .then((metadata) => {
-      newDocument.metadata = metadata;
-    })
-    .finally(() => {
-      newDocument
-        .save()
-        .then((mongoDocument) => {
-          res.status(201).json(mongoDocument);
+    if (checkIfImage(newDocument.url)) {
+      newDocument.isImage = true;
+      newDocument.metadata = {
+        image: newDocument.url
+      };
+      saveDocument(newDocument, res);
+    } else {
+      urlMetadata(newDocument.url)
+        .then((metadata) => {
+          console.log(metadata);
+          newDocument.metadata = metadata;
         })
         .catch((err) => {
-          res.status(400).json(err);
+          console.log(err);
+        })
+        .finally(() => {
+          saveDocument(newDocument, res);
         });
-    });
+    }
+  });
 };
 
 const getDocumentByShortId = (req, res) => {
