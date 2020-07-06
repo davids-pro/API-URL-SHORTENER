@@ -15,7 +15,6 @@
     "cors": "^2.8.5",
     "custom-env": "^2.0.1",
     "express": "^4.17.1",
-    "html-metadata": "^1.7.1",
     "mongoose": "^5.9.21",
     "nodemon": "^2.0.4",
     "pug": "^3.0.0",

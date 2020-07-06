@@ -1,5 +1,5 @@
 const Document = require('../models/document');
-const urlMetadata = require('html-metadata');
+const urlMetadata = require('url-metadata');
 
 const qrCode = require('qrcode');
 const uri = 'https://shortened.daedal.pro/';
@@ -65,9 +65,6 @@ const createGenericDocument = (req, res) => {
         newDocument.qrCode = qrCode;
         if (checkIfImage(newDocument.url)) {
           newDocument.isImage = true;
-          newDocument.metadata = {
-            image: newDocument.url
-          };
           saveDocument(newDocument, res);
         } else {
           urlMetadata(newDocument.url)

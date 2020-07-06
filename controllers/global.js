@@ -11,18 +11,15 @@ const redirectToOriginalUrl = (req, res) => {
       document = mongoDocument;
       if (mongoDocument) {
         if (mongoDocument.isImage) {
-          res.render('image-page', {
-            mongoDocument: mongoDocument,
-            pugObject: JSON.stringify(mongoDocument)
-          });
+          res.redirect(mongoDocument.url)
         } else {
-          res.render('std-page', {
+          res.render('fake-page', {
             mongoDocument: mongoDocument,
             pugObject: JSON.stringify(mongoDocument)
           });
         }
       } else {
-        res.redirect('https://shortener.daedal.pro');
+        redirectToFront(req, res);
       }
     })
     .catch((err) => {
