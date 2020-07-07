@@ -27,8 +27,8 @@ const securityCodeMailer = (recipient, username, securityCode) => {
   const mail = {
     from: gmailUser,
     to: recipient,
-    subject: 'URL Shortener - Votre demande de réinitialisation de mot de passe',
-    html: `<p>Bonjour ${username},</p><br><p>Votre code de sécurité:  <span style="font-size: 24px">${securityCode}</span></p>`
+    subject: 'Votre code de sécurité',
+    html: `<p>Bonjour ${username},</p><p>Voici code de sécurité afin de modifier votre mot de passe:<br><span style="font-size: 24px">${securityCode}</span></p>`
   };
   transporter.sendMail(mail, (err, res) => {
     if (err) console.log(err);
