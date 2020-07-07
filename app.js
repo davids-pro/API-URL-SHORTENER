@@ -1,11 +1,4 @@
-/**
- * pensez à renseigner le fichier .env
- * DB_HOST = adresse de la MongoDB
- * DB_AUTH = nom de la collection MongoDB contenant les users de la DB
- * DB_USER = nom d'utilisateur de la DB
- * BD_PASS = mot de passe de la DB
- */
-require('custom-env').env('prod');
+const { dbHost, dbAuth, dbUser, dbPass } = require('./config');
 
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -15,16 +8,16 @@ const cors = require('cors');
 
 const app = express();
 
-const mongodb = process.env.DB_HOST;
+const mongodb = dbHost;
 
 mongoose
   .connect(mongodb, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
-    auth: { authSource: process.env.DB_AUTH },
-    user: process.env.DB_USER,
-    pass: process.env.DB_PASS
+    auth: { authSource: dbAuth },
+    user: dbUser,
+    pass: dbPass
   })
   .then(() => console.log('** MONGODB connexion success **'))
   .catch((err) => {

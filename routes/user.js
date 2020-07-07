@@ -5,8 +5,8 @@ const router = express.Router();
 
 router.post('/', userController.createUser);
 router.post('/auth', userController.getUserByUsername);
-router.post('/checkUser', userController.verifyIfUsernameIsAvailable);
-router.put('/:id', userController.updateUserById);
-router.delete('/:id', userController.deleteUserById);
+router.post('/check', userController.verifyIfUsernameIsAvailable);
+router.post('/askResetCode', userController.sendResetCode);
+router.put('/updatePassword', userController.updateUserPassword);
 
 module.exports = router;

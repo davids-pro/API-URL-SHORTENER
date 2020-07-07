@@ -1,14 +1,38 @@
+const { gmailPass, gmailUser } = require('../config');
+
 const User = require('../models/user');
+
 const bcrypt = require('bcrypt');
 
-const hashPassword = async (password) => {
-  const hashedPassword = await new Promise((resolve, reject) => {
+const nodemailer = require('nodemailer');
+const transporter = nodemailer.createTransport({
+  service: 'Gmail',
+  auth: {
+    user: gmailUser,
+    pass: gmailPass
+  }
+});
+
+const hashPassword = (password) => {
+  const hashedPassword = new Promise((resolve, reject) => {
     bcrypt.hash(password, 10, (err, hash) => {
       if (err) reject(err);
       resolve(hash);
     });
   });
   return hashedPassword;
+};
+
+const securityCodeMailer = (recipient, username, securityCode) => {
+  const mail = {
+    from: gmailUser,
+    to: recipient,
+    subject: 'URL Shortener - Votre demande de réinitialisation de mot de passe',
+    html: `<p>Bonjour ${username},</p><br><p>Votre code de sécurité:  <span style="font-size: 24px">${securityCode}</span></p>`
+  };
+  transporter.sendMail(mail, (err, res) => {
+    if (err) console.log(err);
+  });
 };
 
 const createUser = (req, res) => {
@@ -42,26 +66,6 @@ const getUserByUsername = (req, res) => {
     });
 };
 
-const updateUserById = (req, res) => {
-  User.findByIdAndUpdate(req.params.id, { ...req.body }, { new: true })
-    .then((mongoUser) => {
-      res.status(200).json(mongoUser);
-    })
-    .catch((err) => {
-      res.status(400).json(err);
-    });
-};
-
-const deleteUserById = (req, res) => {
-  User.findByIdAndDelete(req.params.id)
-    .then(() => {
-      res.status(200).json();
-    })
-    .catch((err) => {
-      res.status(400).json(err);
-    });
-};
-
 const verifyIfUsernameIsAvailable = (req, res) => {
   User.findOne({ username: req.body.username })
     .then((mongoUser) => {
@@ -72,8 +76,57 @@ const verifyIfUsernameIsAvailable = (req, res) => {
     });
 };
 
+const sendResetCode = (req, res) => {
+  let user;
+  const code = Math.floor(100000 + Math.random() * 900000);
+  User.findOne({ username: req.body.username })
+    .then((mongoUser) => {
+      user = mongoUser;
+      res.status(200).json();
+    })
+    .catch((err) => {
+      res.status(400).json(err);
+    })
+    .finally(() => {
+      if (user) {
+        securityCodeMailer(user.email, user.username, code);
+        user.resetCode = code;
+        User.findByIdAndUpdate(user._id, user, { new: true }).catch((err) => {
+          console.log(err);
+        });
+      }
+    });
+};
+
+const updateUserPassword = (req, res) => {
+  User.findOne({ username: req.body.username })
+    .then((mongoUser) => {
+      if (mongoUser.resetCode == req.body.code) {
+        hashPassword(req.body.password)
+          .then((hashedPassword) => {
+            User.findOneAndUpdate({ username: req.body.username }, { password: hashedPassword, resetCode: 0 }, { new: true })
+              .then((mongoUser) => {
+                console.log(mongoUser);
+                res.status(200).json();
+              })
+              .catch((err) => {
+                res.status(400).json(err);
+              });
+          })
+          .catch((err) => {
+            res.status(500).json(err);
+          });
+      } else {
+        res.status(500).json(err);
+      }
+    })
+    .catch((err) => {
+      res.status(400).json(err);
+    });
+};
+
 exports.createUser = createUser;
 exports.getUserByUsername = getUserByUsername;
-exports.updateUserById = updateUserById;
-exports.deleteUserById = deleteUserById;
 exports.verifyIfUsernameIsAvailable = verifyIfUsernameIsAvailable;
+exports.sendResetCode = sendResetCode;
+exports.updateUserPassword = updateUserPassword;

@@ -5,7 +5,7 @@ const User = mongoose.Schema({
   password: { type: String },
   username: { type: String },
   created: { type: Date, default: Date.now },
-  lastConnexion: { type: Date }
+  resetCode: { type: Number, default: 0 }
 });
 
 module.exports = mongoose.model('User', User);
