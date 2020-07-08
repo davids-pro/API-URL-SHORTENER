@@ -33,8 +33,8 @@ const securityCodeMailer = (recipient, username, securityCode) => {
   const mail = {
     from: gmailUser,
     to: recipient,
-    subject: 'URL Shortener - Votre demande de réinitialisation de mot de passe',
-    html: `<p>Bonjour ${username},</p><br><p>Votre code de sécurité:  <span style="font-size: 24px">${securityCode}</span></p>`
+    subject: 'Votre code de sécurité',
+    html: `<p>Bonjour ${username},</p><p>Votre code de sécurité afin de modifier votre mot de passe:</p><span style="font-size: 24px">${securityCode}</span>`
   };
   transporter.sendMail(mail, (err, res) => {
     if (err) console.log(err);
@@ -78,7 +78,7 @@ const getUserByUsername = (req, res) => {
       });
     })
     .catch((err) => {
-      res.status(401).json();
+      res.status(401).json(err);
     });
 };
 
@@ -137,8 +137,7 @@ const updateUserPassword = (req, res) => {
           .then((hashedPassword) => {
             // et mets à jour l'utilisateur dans la base de données
             User.findOneAndUpdate({ username: req.body.username }, { password: hashedPassword, resetCode: 0 }, { new: true })
-              .then((mongoUser) => {
-                console.log(mongoUser);
+              .then(() => {
                 res.status(200).json();
               })
               .catch((err) => {
@@ -149,11 +148,11 @@ const updateUserPassword = (req, res) => {
             res.status(500).json(err);
           });
       } else {
-        res.status(500).json(err);
+        res.status(401).json();
       }
     })
     .catch((err) => {
-      res.status(400).json(err);
+      res.status(401).json(err);
     });
 };
 
