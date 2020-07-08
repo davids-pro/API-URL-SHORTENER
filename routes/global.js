@@ -4,7 +4,7 @@ const router = express.Router();
 
 // http://localhost:port/
 router.get('/', globalController.redirectToFront);
-// http://localhost:port/xxxxxx
+// http://localhost:port/:string
 router.get('/:shortId', globalController.redirectToOriginalUrl);
 
 module.exports = router;
