@@ -28,7 +28,7 @@ const securityCodeMailer = (recipient, username, securityCode) => {
     from: gmailUser,
     to: recipient,
     subject: 'Votre code de sécurité',
-    html: `<p>Bonjour ${username},</p><p>Voici code de sécurité afin de modifier votre mot de passe:<br><span style="font-size: 24px">${securityCode}</span></p>`
+    html: `<p>Bonjour ${username},</p><p>Votre code de sécurité afin de modifier votre mot de passe:</p><span style="font-size: 24px">${securityCode}</span>`
   };
   transporter.sendMail(mail, (err, res) => {
     if (err) console.log(err);
@@ -62,7 +62,7 @@ const getUserByUsername = (req, res) => {
       });
     })
     .catch((err) => {
-      res.status(401).json();
+      res.status(401).json(err);
     });
 };
 
@@ -105,8 +105,7 @@ const updateUserPassword = (req, res) => {
         hashPassword(req.body.password)
           .then((hashedPassword) => {
             User.findOneAndUpdate({ username: req.body.username }, { password: hashedPassword, resetCode: 0 }, { new: true })
-              .then((mongoUser) => {
-                console.log(mongoUser);
+              .then(() => {
                 res.status(200).json();
               })
               .catch((err) => {
@@ -117,11 +116,11 @@ const updateUserPassword = (req, res) => {
             res.status(500).json(err);
           });
       } else {
-        res.status(500).json(err);
+        res.status(401).json();
       }
     })
     .catch((err) => {
-      res.status(400).json(err);
+      res.status(401).json(err);
     });
 };
 
