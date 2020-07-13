@@ -19,7 +19,7 @@ const qrCodeOptions = {
   margin: 1,
   // QRCode bleu sur fond blanc
   color: {
-    dark: '#212121',
+    dark: '#000',
     light: '#2196f3'
   }
 };
