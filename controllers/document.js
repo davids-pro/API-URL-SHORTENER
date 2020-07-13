@@ -16,7 +16,7 @@ const qrCodeOptions = {
   // grossissement x10
   scale: 10,
   // margin de 1 pixel (10 pixels grossis)
-  margin: 0,
+  margin: 1,
   // QRCode bleu sur fond blanc
   color: {
     dark: '#212121',
