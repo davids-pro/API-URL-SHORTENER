@@ -60,7 +60,9 @@ const addHttpProtocol = (url) => {
  */
 const addPreviewImage = (url) => {
   return url.match(/\.(jpeg|jpg|gif|png|webp)$/) !== null || url.match(/^data:image/) !== null
-    ? url
+    ? new Promise((resolve) => {
+        resolve(url);
+      })
     : new Promise((resolve, reject) => {
         urlMetadata(url)
           .then((metadata) => {
